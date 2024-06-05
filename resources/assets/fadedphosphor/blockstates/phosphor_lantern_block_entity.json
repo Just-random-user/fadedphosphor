@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "hanging=false,waterlogged=false": { "model": "fadedphosphor:block/phosphor_lantern" },
+    "hanging=true,waterlogged=false": { "model": "fadedphosphor:block/phosphor_lantern" },
+
+    "hanging=false,waterlogged=true": { "model": "fadedphosphor:block/phosphor_lantern" },
+    "hanging=true,waterlogged=true": { "model": "fadedphosphor:block/phosphor_lantern" }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "fadedphosphor:phosphate_bottle"
+  },
+  "result": "fadedphosphor:phosphor_bottle"
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NNN",
+    "NPN",
+    "NNN"
+  ],
+  "key": {
+    "N": {
+      "item": "minecraft:iron_nugget"
+    },
+    "P": {
+      "item": "fadedphosphor:phosphor_bottle"
+    }
+  },
+  "result": {
+    "item": "fadedphosphor:phosphor_lantern"
+  }
+}

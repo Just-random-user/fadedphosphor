@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "fadedphosphor:block/phosphor_lantern"
+    },
+    "hanging=true": {
+      "model": "fadedphosphor:block/phosphor_lantern_hanging"
+    }
+  }
+}

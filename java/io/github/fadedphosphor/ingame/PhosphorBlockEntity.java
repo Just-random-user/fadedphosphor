@@ -11,22 +11,39 @@ import org.jetbrains.annotations.NotNull;
 
 public class PhosphorBlockEntity extends BlockEntity implements BlockEntityTicker<PhosphorBlockEntity> {
     private int ticks = 0;
-    private static final int updateFreqTicks = 100;
+    private static final int UPDATE_FREQ_TICKS = 1;
 
     private int charge = 0;
-    private static final int maxCharge = 32;
-
-    public int getCharge() { return charge; }
-    public void changeCharge(int value)
-    {
-        int newCharge = charge + value;
-        if (newCharge > maxCharge)
-            charge = maxCharge;
-        else charge = Math.max(newCharge, 0);
-    }
+    private static final int PIECES_IN_ONE_CHARGE = 8;
 
     public PhosphorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityInit.PHOSPHOR_LANTERN_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    private int calculateMaxCharge(int lightLevel) { return lightLevel * PIECES_IN_ONE_CHARGE; }  // TODO: check performance
+    public int calculateLightingLevel() { return charge / PIECES_IN_ONE_CHARGE; }
+    private void changeLightingLevel()
+    {
+        int targetLightingLevel = calculateLightingLevel();
+        assert this.level != null;
+        this.level.setBlock(this.getBlockPos(), this.level.getBlockState(this.getBlockPos())
+                .setValue(PhosphorBlock.LEVEL, Math.min(Math.max(targetLightingLevel - 1, 0), 15)), 2);
+    }
+
+    public int getCharge() { return charge; }
+    public int getMaxCharge()
+    {
+        if(this.level != null)
+            return calculateMaxCharge(this.level.getRawBrightness(this.getBlockPos(), this.level.getSkyDarken()));
+        else return -1;
+    }
+    public void changeCharge(int lightLevel)
+    {
+        int currMaxCharge = calculateMaxCharge(lightLevel);
+        if (charge < currMaxCharge)
+            charge++;
+        else if (charge > currMaxCharge)
+            charge--;
     }
 
     @Override
@@ -45,13 +62,14 @@ public class PhosphorBlockEntity extends BlockEntity implements BlockEntityTicke
     }
 
     @Override
-    public void tick(@NotNull Level p_155253_, @NotNull BlockPos p_155254_, @NotNull BlockState p_155255_,
-                     @NotNull PhosphorBlockEntity p_155256_) {
+    public void tick(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state,
+                     @NotNull PhosphorBlockEntity phosphorBlockEntity) {
         if (this.level == null || this.level.isClientSide()) return;
-        if (ticks++ == updateFreqTicks)
+        if (ticks++ == UPDATE_FREQ_TICKS)
         {
             ticks = 0;
-            changeCharge(1);
+            changeCharge(level.getRawBrightness(pos, level.getSkyDarken()));
+            changeLightingLevel();
             saveAdditional(this.getUpdateTag());
         }
     }

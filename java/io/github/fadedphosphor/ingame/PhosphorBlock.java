@@ -8,18 +8,29 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
 public class PhosphorBlock extends LanternBlock implements EntityBlock {
+    public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL;
+
     public PhosphorBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, Integer.valueOf(0)));
+    }
+
+    @Override
+    public void onBlockStateChange(LevelReader level, BlockPos pos, BlockState oldState, BlockState newState) {
+        level.getBlockState(pos).setValue(LEVEL, newState.getValue(PhosphorBlock.LEVEL)); //setValue(LEVEL, newState);
     }
 
     @Nullable
@@ -30,6 +41,7 @@ public class PhosphorBlock extends LanternBlock implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
+        builder.add(LEVEL);
         super.createBlockStateDefinition(builder);
     }
 
@@ -46,8 +58,10 @@ public class PhosphorBlock extends LanternBlock implements EntityBlock {
         if(!level.isClientSide()) {
             BlockEntity be = level.getBlockEntity(pos);
             if(be instanceof PhosphorBlockEntity && hand == InteractionHand.MAIN_HAND) {
-                player.sendSystemMessage(Component.literal("TARGET VALUE    : %d".formatted(level.getRawBrightness(pos, level.getSkyDarken()))));
-                player.sendSystemMessage(Component.literal("CHARGE          : %d".formatted(((PhosphorBlockEntity) be).getCharge())));
+                player.sendSystemMessage(Component.literal("-> LIGHT LEVEL : %d".formatted(level.getRawBrightness(pos, level.getSkyDarken()))));
+                player.sendSystemMessage(Component.literal("   CHARGE      : %d".formatted(((PhosphorBlockEntity) be).getCharge())));
+                player.sendSystemMessage(Component.literal("   MAX CHARGE  : %d".formatted(((PhosphorBlockEntity) be).getMaxCharge())));
+                player.sendSystemMessage(Component.literal("   TLL         : %d".formatted(((PhosphorBlockEntity) be).calculateLightingLevel())));
                 return InteractionResult.sidedSuccess(level.isClientSide());
             }
         }

@@ -10,14 +10,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 public class PhosphorBlockEntity extends BlockEntity implements BlockEntityTicker<PhosphorBlockEntity> {
-    private int ticks = 0;
+    private  static final int INITIAL_LIGHT_LEVEL = 8;
+    private static final int PIECES_IN_ONE_CHARGE = 8;
     private static final int UPDATE_FREQ_TICKS = 1;
 
-    private int charge = 0;
-    private static final int PIECES_IN_ONE_CHARGE = 8;
+    private int ticks = 0;
+    private int charge;
 
     public PhosphorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityInit.PHOSPHOR_LANTERN_BLOCK_ENTITY.get(), pos, state);
+        this.charge = PIECES_IN_ONE_CHARGE * INITIAL_LIGHT_LEVEL;
     }
 
     private int calculateMaxCharge(int lightLevel) { return lightLevel * PIECES_IN_ONE_CHARGE; }  // TODO: check performance
